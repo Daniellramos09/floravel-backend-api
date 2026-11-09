@@ -1,0 +1,55 @@
+package br.com.floravel.floravel.domain.usuario;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "usuarios")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Usuario {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(length = 36, nullable = false, updatable = false)
+    private String id;
+
+    @Column(nullable = false, length = 150)
+    private String nome;
+
+    @Column(nullable = false, unique = true, length = 150)
+    private String email;
+
+    @Column(nullable = false, length = 255)
+    private String senha;
+
+    @Column(length = 30)
+    private String telefone;
+
+    @Column(name = "foto_url", length = 500)
+    private String fotoUrl;
+
+    @Column(length = 100)
+    private String cidade;
+
+    @Column(length = 50)
+    private String estado;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_perfil", nullable = false, length = 50)
+    private TipoPerfil tipoPerfil;
+
+    @Builder.Default
+    @Column(name = "email_verificado", nullable = false)
+    private Boolean emailVerificado = false;
+
+    @CreationTimestamp
+    @Column(name = "data_criacao", updatable = false)
+    private LocalDateTime dataCriacao;
+}
