@@ -1,6 +1,5 @@
-package br.com.floravel.floravel.model.entity;
+package br.com.floravel.floravel.domain.usuario;
 
-import br.com.floravel.floravel.model.enums.TipoPerfil;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

@@ -1,7 +1,7 @@
-package br.com.floravel.floravel.dto.response;
+package br.com.floravel.floravel.domain.mae.dto;
 
-import br.com.floravel.floravel.model.entity.Mae;
-import br.com.floravel.floravel.model.entity.Usuario;
+import br.com.floravel.floravel.domain.mae.Mae;
+import br.com.floravel.floravel.domain.usuario.Usuario;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 

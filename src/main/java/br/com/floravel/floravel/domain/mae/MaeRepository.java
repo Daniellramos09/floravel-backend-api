@@ -1,6 +1,5 @@
-package br.com.floravel.floravel.repository;
+package br.com.floravel.floravel.domain.mae;
 
-import br.com.floravel.floravel.model.entity.Mae;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

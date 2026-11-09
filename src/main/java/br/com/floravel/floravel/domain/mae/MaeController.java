@@ -1,9 +1,8 @@
-package br.com.floravel.floravel.controller;
+package br.com.floravel.floravel.domain.mae;
 
-import br.com.floravel.floravel.dto.request.AtualizacaoMaeRequestDTO;
-import br.com.floravel.floravel.dto.request.CadastroMaeRequestDTO;
-import br.com.floravel.floravel.dto.response.MaeResponseDTO;
-import br.com.floravel.floravel.service.MaeService;
+import br.com.floravel.floravel.domain.mae.dto.AtualizacaoMaeRequestDTO;
+import br.com.floravel.floravel.domain.mae.dto.CadastroMaeRequestDTO;
+import br.com.floravel.floravel.domain.mae.dto.MaeResponseDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

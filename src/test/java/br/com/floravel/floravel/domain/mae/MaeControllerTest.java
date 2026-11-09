@@ -1,10 +1,8 @@
-package br.com.floravel.floravel.controller;
+package br.com.floravel.floravel.domain.mae;
 
-import br.com.floravel.floravel.dto.request.CadastroMaeRequestDTO;
-import br.com.floravel.floravel.exception.GlobalExceptionHandler;
-import br.com.floravel.floravel.repository.MaeRepository;
-import br.com.floravel.floravel.repository.UsuarioRepository;
-import br.com.floravel.floravel.service.MaeService;
+import br.com.floravel.floravel.common.exception.GlobalExceptionHandler;
+import br.com.floravel.floravel.domain.mae.dto.CadastroMaeRequestDTO;
+import br.com.floravel.floravel.domain.usuario.UsuarioRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -122,5 +121,44 @@ class MaeControllerTest {
                 .andExpect(jsonPath("$.validationErrors.nome").exists())
                 .andExpect(jsonPath("$.validationErrors.email").exists())
                 .andExpect(jsonPath("$.validationErrors.senha").exists());
+    }
+
+    @Test
+    @DisplayName("Deve retornar 422 Unprocessable Entity para idade biológica incompatível com maternidade")
+    void deveRetornar422ParaDataNascimentoIncompativel() throws Exception {
+        CadastroMaeRequestDTO requestIdadeInvalida = CadastroMaeRequestDTO.builder()
+                .nome("Menina Pequena")
+                .email("menina@email.com")
+                .senha("senha123")
+                .dataNascimento(LocalDate.now().minusYears(4)) // 4 anos de idade
+                .build();
+
+        mockMvc.perform(post("/api/maes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestIdadeInvalida)))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.status").value(422))
+                .andExpect(jsonPath("$.error").value("Regra de Negócio Violada"))
+                .andExpect(jsonPath("$.message", containsString("idade incompatível")));
+    }
+
+    @Test
+    @DisplayName("Deve buscar mãe por e-mail com sucesso")
+    void deveBuscarMaePorEmailComSucesso() throws Exception {
+        CadastroMaeRequestDTO request = CadastroMaeRequestDTO.builder()
+                .nome("Beatriz Lima")
+                .email("beatriz.lima@email.com")
+                .senha("senha123")
+                .build();
+
+        mockMvc.perform(post("/api/maes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/maes/email/beatriz.lima@email.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("Beatriz Lima"))
+                .andExpect(jsonPath("$.email").value("beatriz.lima@email.com"));
     }
 }

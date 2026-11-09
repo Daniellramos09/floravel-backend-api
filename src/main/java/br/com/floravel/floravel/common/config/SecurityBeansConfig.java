@@ -1,4 +1,4 @@
-package br.com.floravel.floravel.config;
+package br.com.floravel.floravel.common.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

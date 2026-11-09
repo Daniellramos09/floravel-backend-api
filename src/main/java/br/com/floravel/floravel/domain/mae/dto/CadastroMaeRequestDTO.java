@@ -1,4 +1,4 @@
-package br.com.floravel.floravel.dto.request;
+package br.com.floravel.floravel.domain.mae.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
@@ -26,7 +26,7 @@ public class CadastroMaeRequestDTO {
     private String email;
 
     @NotBlank(message = "A senha é obrigatória")
-    @Size(min = 6, max = 100, message = "A senha deve ter entre 6 e 100 caracteres")
+    @Size(min = 6, max = 100, message = "A senha deve conter no mínimo 6 caracteres")
     private String senha;
 
     @Size(max = 30, message = "O telefone não pode exceder 30 caracteres")
@@ -41,7 +41,7 @@ public class CadastroMaeRequestDTO {
     @Size(max = 50, message = "O estado não pode exceder 50 caracteres")
     private String estado;
 
-    @Past(message = "A data de nascimento deve ser uma data no passado")
+    @Past(message = "A data de nascimento deve ser uma data válida no passado")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataNascimento;
 }

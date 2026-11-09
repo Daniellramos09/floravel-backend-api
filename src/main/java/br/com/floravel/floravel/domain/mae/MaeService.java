@@ -1,20 +1,21 @@
-package br.com.floravel.floravel.service;
+package br.com.floravel.floravel.domain.mae;
 
-import br.com.floravel.floravel.dto.request.AtualizacaoMaeRequestDTO;
-import br.com.floravel.floravel.dto.request.CadastroMaeRequestDTO;
-import br.com.floravel.floravel.dto.response.MaeResponseDTO;
-import br.com.floravel.floravel.exception.EmailJaCadastradoException;
-import br.com.floravel.floravel.exception.RecursoNaoEncontradoException;
-import br.com.floravel.floravel.model.entity.Mae;
-import br.com.floravel.floravel.model.entity.Usuario;
-import br.com.floravel.floravel.model.enums.TipoPerfil;
-import br.com.floravel.floravel.repository.MaeRepository;
-import br.com.floravel.floravel.repository.UsuarioRepository;
+import br.com.floravel.floravel.common.exception.RegraDeNegocioException;
+import br.com.floravel.floravel.domain.mae.dto.AtualizacaoMaeRequestDTO;
+import br.com.floravel.floravel.domain.mae.dto.CadastroMaeRequestDTO;
+import br.com.floravel.floravel.domain.mae.dto.MaeResponseDTO;
+import br.com.floravel.floravel.domain.mae.exception.EmailJaCadastradoException;
+import br.com.floravel.floravel.domain.mae.exception.MaeNaoEncontradaException;
+import br.com.floravel.floravel.domain.usuario.TipoPerfil;
+import br.com.floravel.floravel.domain.usuario.Usuario;
+import br.com.floravel.floravel.domain.usuario.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 
 @Service
@@ -27,13 +28,19 @@ public class MaeService {
 
     @Transactional
     public MaeResponseDTO cadastrarMae(CadastroMaeRequestDTO dto) {
-        if (usuarioRepository.existsByEmail(dto.getEmail())) {
-            throw new EmailJaCadastradoException(dto.getEmail());
+        String emailNormalizado = dto.getEmail().trim().toLowerCase();
+
+        // Regra de Negócio: E-mail único na plataforma
+        if (usuarioRepository.existsByEmail(emailNormalizado)) {
+            throw new EmailJaCadastradoException(emailNormalizado);
         }
+
+        // Regra de Negócio: Validação de faixa etária biológica compatível caso data informada
+        validarDataNascimento(dto.getDataNascimento());
 
         Usuario usuario = Usuario.builder()
                 .nome(dto.getNome().trim())
-                .email(dto.getEmail().trim().toLowerCase())
+                .email(emailNormalizado)
                 .senha(passwordEncoder.encode(dto.getSenha()))
                 .telefone(dto.getTelefone() != null ? dto.getTelefone().trim() : null)
                 .fotoUrl(dto.getFotoUrl() != null ? dto.getFotoUrl().trim() : null)
@@ -62,21 +69,22 @@ public class MaeService {
     @Transactional(readOnly = true)
     public MaeResponseDTO buscarPorId(String id) {
         Mae mae = maeRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Mãe não encontrada com o ID: " + id));
+                .orElseThrow(() -> MaeNaoEncontradaException.porId(id));
         return MaeResponseDTO.fromEntity(mae);
     }
 
     @Transactional(readOnly = true)
     public MaeResponseDTO buscarPorEmail(String email) {
-        Mae mae = maeRepository.findByUsuarioEmail(email.trim().toLowerCase())
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Mãe não encontrada com o e-mail: " + email));
+        String emailNormalizado = email.trim().toLowerCase();
+        Mae mae = maeRepository.findByUsuarioEmail(emailNormalizado)
+                .orElseThrow(() -> MaeNaoEncontradaException.porEmail(emailNormalizado));
         return MaeResponseDTO.fromEntity(mae);
     }
 
     @Transactional
     public MaeResponseDTO atualizarMae(String id, AtualizacaoMaeRequestDTO dto) {
         Mae mae = maeRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Mãe não encontrada com o ID: " + id));
+                .orElseThrow(() -> MaeNaoEncontradaException.porId(id));
 
         Usuario usuario = mae.getUsuario();
 
@@ -96,6 +104,7 @@ public class MaeService {
             usuario.setEstado(dto.getEstado().trim());
         }
         if (dto.getDataNascimento() != null) {
+            validarDataNascimento(dto.getDataNascimento());
             mae.setDataNascimento(dto.getDataNascimento());
         }
 
@@ -106,7 +115,24 @@ public class MaeService {
     @Transactional
     public void excluirMae(String id) {
         Mae mae = maeRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Mãe não encontrada com o ID: " + id));
+                .orElseThrow(() -> MaeNaoEncontradaException.porId(id));
         maeRepository.delete(mae);
+    }
+
+    private void validarDataNascimento(LocalDate dataNascimento) {
+        if (dataNascimento == null) return;
+
+        LocalDate hoje = LocalDate.now();
+        if (dataNascimento.isAfter(hoje)) {
+            throw new RegraDeNegocioException("A data de nascimento não pode ser futura.");
+        }
+
+        int idade = Period.between(dataNascimento, hoje).getYears();
+        if (idade < 10) {
+            throw new RegraDeNegocioException("Data de nascimento inválida: idade incompatível para cadastro materno.");
+        }
+        if (idade > 120) {
+            throw new RegraDeNegocioException("Data de nascimento inválida: favor informar uma data válida.");
+        }
     }
 }

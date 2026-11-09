@@ -1,4 +1,4 @@
-package br.com.floravel.floravel.exception;
+package br.com.floravel.floravel.common.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;

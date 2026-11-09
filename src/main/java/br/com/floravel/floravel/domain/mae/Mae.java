@@ -1,5 +1,6 @@
-package br.com.floravel.floravel.model.entity;
+package br.com.floravel.floravel.domain.mae;
 
+import br.com.floravel.floravel.domain.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
 

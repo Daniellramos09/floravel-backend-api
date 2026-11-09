@@ -1,4 +1,4 @@
-package br.com.floravel.floravel.dto.request;
+package br.com.floravel.floravel.domain.mae.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Past;
@@ -29,7 +29,7 @@ public class AtualizacaoMaeRequestDTO {
     @Size(max = 50, message = "O estado não pode exceder 50 caracteres")
     private String estado;
 
-    @Past(message = "A data de nascimento deve ser uma data no passado")
+    @Past(message = "A data de nascimento deve ser uma data válida no passado")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataNascimento;
 }
