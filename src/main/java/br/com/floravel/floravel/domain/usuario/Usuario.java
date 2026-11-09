@@ -45,6 +45,10 @@ public class Usuario {
     @Column(name = "tipo_perfil", nullable = false, length = 50)
     private TipoPerfil tipoPerfil;
 
+    @Builder.Default
+    @Column(name = "email_verificado", nullable = false)
+    private Boolean emailVerificado = false;
+
     @CreationTimestamp
     @Column(name = "data_criacao", updatable = false)
     private LocalDateTime dataCriacao;

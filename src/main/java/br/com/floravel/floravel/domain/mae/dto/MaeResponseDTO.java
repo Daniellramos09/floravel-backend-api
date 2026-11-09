@@ -24,6 +24,7 @@ public class MaeResponseDTO {
     private String cidade;
     private String estado;
     private String tipoPerfil;
+    private Boolean emailVerificado;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataNascimento;
@@ -45,6 +46,7 @@ public class MaeResponseDTO {
                 .cidade(usuario != null ? usuario.getCidade() : null)
                 .estado(usuario != null ? usuario.getEstado() : null)
                 .tipoPerfil(usuario != null && usuario.getTipoPerfil() != null ? usuario.getTipoPerfil().name() : null)
+                .emailVerificado(usuario != null && usuario.getEmailVerificado() != null ? usuario.getEmailVerificado() : false)
                 .dataNascimento(mae.getDataNascimento())
                 .dataCriacao(usuario != null ? usuario.getDataCriacao() : null)
                 .build();

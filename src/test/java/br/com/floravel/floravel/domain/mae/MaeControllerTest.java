@@ -1,6 +1,7 @@
 package br.com.floravel.floravel.domain.mae;
 
 import br.com.floravel.floravel.common.exception.GlobalExceptionHandler;
+import br.com.floravel.floravel.domain.auth.TokenConfirmacaoEmailRepository;
 import br.com.floravel.floravel.domain.mae.dto.CadastroMaeRequestDTO;
 import br.com.floravel.floravel.domain.usuario.UsuarioRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,6 +38,9 @@ class MaeControllerTest {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private TokenConfirmacaoEmailRepository tokenRepository;
+
     @BeforeEach
     void setUp() {
         objectMapper = new ObjectMapper();
@@ -46,6 +50,7 @@ class MaeControllerTest {
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
 
+        tokenRepository.deleteAll();
         maeRepository.deleteAll();
         usuarioRepository.deleteAll();
     }
@@ -74,6 +79,7 @@ class MaeControllerTest {
                 .andExpect(jsonPath("$.nome").value("Mariana Silva"))
                 .andExpect(jsonPath("$.email").value("mariana.silva@email.com"))
                 .andExpect(jsonPath("$.tipoPerfil").value("MAE"))
+                .andExpect(jsonPath("$.emailVerificado").value(false))
                 .andExpect(jsonPath("$.cidade").value("São Paulo"))
                 .andExpect(jsonPath("$.estado").value("SP"))
                 .andExpect(jsonPath("$.dataNascimento").value("1996-05-20"));

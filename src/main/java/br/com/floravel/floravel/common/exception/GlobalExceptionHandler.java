@@ -1,5 +1,7 @@
 package br.com.floravel.floravel.common.exception;
 
+import br.com.floravel.floravel.domain.auth.exception.CodigoExpiradoException;
+import br.com.floravel.floravel.domain.auth.exception.CodigoInvalidoException;
 import br.com.floravel.floravel.domain.mae.exception.EmailJaCadastradoException;
 import br.com.floravel.floravel.domain.mae.exception.MaeNaoEncontradaException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,6 +53,30 @@ public class GlobalExceptionHandler {
                 .path(request.getRequestURI())
                 .build();
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+    }
+
+    @ExceptionHandler(CodigoInvalidoException.class)
+    public ResponseEntity<ErrorResponseDTO> handleCodigoInvalido(CodigoInvalidoException ex, HttpServletRequest request) {
+        ErrorResponseDTO error = ErrorResponseDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Código Inválido")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(CodigoExpiradoException.class)
+    public ResponseEntity<ErrorResponseDTO> handleCodigoExpirado(CodigoExpiradoException ex, HttpServletRequest request) {
+        ErrorResponseDTO error = ErrorResponseDTO.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Código Expirado")
+                .message(ex.getMessage())
+                .path(request.getRequestURI())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

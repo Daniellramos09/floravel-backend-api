@@ -1,6 +1,7 @@
 package br.com.floravel.floravel.domain.mae;
 
 import br.com.floravel.floravel.common.exception.RegraDeNegocioException;
+import br.com.floravel.floravel.domain.auth.AuthService;
 import br.com.floravel.floravel.domain.mae.dto.AtualizacaoMaeRequestDTO;
 import br.com.floravel.floravel.domain.mae.dto.CadastroMaeRequestDTO;
 import br.com.floravel.floravel.domain.mae.dto.MaeResponseDTO;
@@ -25,6 +26,7 @@ public class MaeService {
     private final MaeRepository maeRepository;
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
     @Transactional
     public MaeResponseDTO cadastrarMae(CadastroMaeRequestDTO dto) {
@@ -55,6 +57,10 @@ public class MaeService {
                 .build();
 
         Mae maeSalva = maeRepository.save(mae);
+
+        // Dispara geração e envio do código de 6 dígitos para o e-mail cadastrado
+        authService.gerarEEnviarCodigoConfirmacao(maeSalva.getUsuario());
+
         return MaeResponseDTO.fromEntity(maeSalva);
     }
 
